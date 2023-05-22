@@ -22,17 +22,18 @@ public class Customer {
     @NotNull(message = "Contact number cannot be null")
     @Column(unique = true)
     @Pattern(regexp = "[6789]{1}[0-9]{9}", message = "Enter valid 10 digit mobile number")
-    private String mobileNo;
-    @NotNull(message = "Please enter the emaild id")
+    private String contactNumber;
+    @NotNull(message = "Email address cannot be null")
     @Column(unique = true)
     @Email
     private String email;
-    @NotNull(message = "Please enter the password")
-    @Pattern(regexp = "[A-Za-z0-9!@#$%^&*_]{8,15}", message = "Password must be 8-15 characters in length and can include A-Z, a-z, 0-9, or special characters !@#$%^&*_")
+    @NotNull(message = "Password cannot be null")
+    @Pattern(regexp = "[A-Za-z0-9!@#$%^&*_]{8,15}", message = "Password must be 8-15 characters in length and can have A-Z, a-z, 0-9, or special characters !@#$%^&*_")
     private String password;
     private LocalDateTime createdOn;
     @Embedded
     private CreditCard creditCard;
+    //  Establishing Address - Customer relationship
     @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "customer_address_mapping",
             joinColumns = {
@@ -42,8 +43,7 @@ public class Customer {
                     @JoinColumn(name = "address_id", referencedColumnName = "addressId")
             })
     private Map<String, Address> address = new HashMap<>();
-
-    //	Establishing Customer - Order relationship
+    //  Establishing Customer - Order relationship
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer")
     private List<Order> orders = new ArrayList<>();
 
