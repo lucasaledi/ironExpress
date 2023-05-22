@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -30,6 +31,7 @@ public class Customer {
     @NotNull(message = "Password cannot be null")
     @Pattern(regexp = "[A-Za-z0-9!@#$%^&*_]{8,15}", message = "Password must be 8-15 characters in length and can have A-Z, a-z, 0-9, or special characters !@#$%^&*_")
     private String password;
+    @PastOrPresent
     private LocalDateTime createdOn;
     @Embedded
     private CreditCard creditCard;
