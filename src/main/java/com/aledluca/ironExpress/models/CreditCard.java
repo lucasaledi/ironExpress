@@ -12,4 +12,15 @@ public class CreditCard {
     private String expireDate;
     @Pattern(regexp = "[0-9]{3}", message = "Invalid CVV. Must be numeric 3 digits length.")
     private String cvv;
+
+    public CreditCard() {
+    }
+
+    public CreditCard(String cardNumber, String expireDate, String cvv) {
+        this.cardNumber = cardNumber;
+        this.expireDate = expireDate;
+        this.cvv = cvv;
+    }
+
+
 }
