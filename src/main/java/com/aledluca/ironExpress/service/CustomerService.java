@@ -29,6 +29,7 @@ public class CustomerService {
     @Autowired
     private SessionRepository sessionRepository;
 
+    // Add new customer to repo
     public Customer addCustomer(Customer customer) {
         customer.setCreatedOn(LocalDateTime.now());
         Cart cart = new Cart();
@@ -64,9 +65,11 @@ public class CustomerService {
         }
         loginService.checkTokenStatus(token);
         List<Customer> customers = customerRepository.findAll();
-        if(customers.size() == 0)
+        if(customers.size() == 0) {
             throw new CustomerNotFoundException("No record exists");
-        return customers;
+        } else {
+            return customers;
+        }
     }
 
     // Method to update entire customer details - either by contact number or email

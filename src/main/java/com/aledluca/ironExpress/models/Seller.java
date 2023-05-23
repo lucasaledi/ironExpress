@@ -41,22 +41,24 @@ public class Seller {
     public Seller() {
     }
 
-    public Seller(String firstName, String lastName, String contactNumber, String password, String email, List<Product> product) {
+    public Seller(String firstName, String lastName, String contactNumber, String email, String password, LocalDateTime createdOn, List<Product> product) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.contactNumber = contactNumber;
-        this.password = password;
         this.email = email;
+        this.password = password;
+        this.createdOn = createdOn;
         this.product = product;
     }
 
-    public Seller(Integer sellerId, String firstName, String lastName, String contactNumber, String password, String email, List<Product> product) {
+    public Seller(Integer sellerId, String firstName, String lastName, String contactNumber, String email, String password, LocalDateTime createdOn, List<Product> product) {
         this.sellerId = sellerId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.contactNumber = contactNumber;
-        this.password = password;
         this.email = email;
+        this.password = password;
+        this.createdOn = createdOn;
         this.product = product;
     }
 
@@ -98,6 +100,14 @@ public class Seller {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 
     public String getEmail() {
