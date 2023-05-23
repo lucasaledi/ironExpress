@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,16 +24,19 @@ public class Seller {
     @Column(unique = true)
     @Pattern(regexp = "[6789]{1}[0-9]{9}", message = "Enter valid 10 digit mobile number")
     private String contactNumber;
-    @NotNull(message = "Password cannot be null")
-    @Pattern(regexp = "[A-Za-z0-9!@#$%^&*_]{8,15}", message = "Password must be 8-15 characters in length and can have A-Z, a-z, 0-9, or special characters !@#$%^&*_")
-    private String password;
     @NotNull(message = "Email address cannot be null")
     @Email
     @Column(unique = true)
     private String email;
+    @NotNull(message = "Password cannot be null")
+    @Pattern(regexp = "[A-Za-z0-9!@#$%^&*_]{8,15}", message = "Password must be 8-15 characters in length and can have A-Z, a-z, 0-9, or special characters !@#$%^&*_")
+    private String password;
+    @PastOrPresent
+    private LocalDateTime createdOn;
     @OneToMany
     @JsonIgnore
     private List<Product> product;
+
 
     public Seller() {
     }

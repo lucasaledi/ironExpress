@@ -45,10 +45,10 @@ public class Customer {
     //  Establishing Customer - Order relationship
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer")
     private List<Order> orders = new ArrayList<>();
-
     //	Establishing Customer - Cart relationship
     @OneToOne(cascade = CascadeType.ALL)
     private Cart customerCart;
+
 
     public Customer() {
     }

@@ -32,14 +32,11 @@ public class Product {
     private Category category;
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
-
 //	@ManyToMany(cascade = CascadeType.ALL)
 //	private Order order;
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JsonIgnore
     private Seller seller;
-
 //	@ManyToMany
 //	@JsonIgnore
 //	private List<Cart> productCarts = new ArrayList<>();

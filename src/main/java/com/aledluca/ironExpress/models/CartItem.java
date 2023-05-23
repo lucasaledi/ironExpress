@@ -19,6 +19,7 @@ public class CartItem {
     private Product cartProduct;
     private Integer cartItemQuantity;
 
+
     public CartItem() {
     }
 
