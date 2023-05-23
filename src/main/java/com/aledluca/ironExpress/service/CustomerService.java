@@ -6,7 +6,9 @@ import com.aledluca.ironExpress.exception.LoginException;
 import com.aledluca.ironExpress.models.Cart;
 import com.aledluca.ironExpress.models.Customer;
 import com.aledluca.ironExpress.models.Order;
+import com.aledluca.ironExpress.models.UserSession;
 import com.aledluca.ironExpress.repository.CustomerRepository;
+import com.aledluca.ironExpress.repository.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,10 @@ import java.util.ArrayList;
 public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
+    private LoginLogoutService loginService;
+    @Autowired
+    private SessionRepository sessionRepository;
 
     public Customer addCustomer(Customer customer) {
         customer.setCreatedOn(LocalDateTime.now());
@@ -41,7 +47,7 @@ public class CustomerService {
 
         loginService.checkTokenStatus(token);
 
-        UserSession user = sessionDao.findByToken(token).get();
+        UserSession user = sessionRepository.findByToken(token).get();
 
         Optional<Customer> opt = customerRepository.findById(user.getUserId());
 
