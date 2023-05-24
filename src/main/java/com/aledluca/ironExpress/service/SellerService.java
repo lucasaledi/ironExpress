@@ -1,18 +1,15 @@
 package com.aledluca.ironExpress.service;
 
-import com.aledluca.ironExpress.exception.CustomerException;
-import com.aledluca.ironExpress.exception.LoginException;
-import com.aledluca.ironExpress.exception.SellerException;
-import com.aledluca.ironExpress.exception.SellerNotFoundException;
-import com.aledluca.ironExpress.models.Customer;
-import com.aledluca.ironExpress.models.Product;
-import com.aledluca.ironExpress.models.Seller;
+import com.aledluca.ironExpress.dto.SellerDTO;
+import com.aledluca.ironExpress.dto.SellerUpdateDTO;
+import com.aledluca.ironExpress.dto.SessionDTO;
+import com.aledluca.ironExpress.exception.*;
+import com.aledluca.ironExpress.models.*;
 import com.aledluca.ironExpress.repository.SellerRepository;
 import com.aledluca.ironExpress.repository.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +37,22 @@ public class SellerService {
         return seller;
     }
 
-    // Get all sellers in repo
+    // Get logged-in seller details
+    public Seller getCurrentlyLoggedInSeller(String token) throws SellerNotFoundException {
+        if(token.contains("seller") == false) {
+            throw new LoginException("Invalid session token for seller");
+        }
+        loginService.checkTokenStatus(token);
+        UserSession user = sessionRepository.findByToken(token).get();
+        Optional<Seller> opt = sellerRepository.findById(user.getUserId());
+        if(opt.isEmpty()) {
+            throw new SellerNotFoundException("Customer does not exist");
+        }
+        Seller existingSeller = opt.get();
+        return existingSeller;
+    }
+
+    // Get all sellers in repo - only seller or admin can get all customers - check validity of seller token
     public List<Seller> getAllSellers(String token) throws SellerNotFoundException {
         if(token.contains("seller") == false) {
             throw new LoginException("Invalid session token.");
@@ -64,16 +76,131 @@ public class SellerService {
         }
     }
     
-    // Update seller data
-    public Seller updateSeller(Seller seller, String token) {
+    // Update seller data - either by contact number or email
+    public Seller updateSeller(SellerUpdateDTO seller, String token) throws SellerNotFoundException {
         if(token.contains("seller") == false) {
             throw new LoginException("Invalid session token for seller");
         }
         loginService.checkTokenStatus(token);
-        Optional<Seller> opt = sellerRepository.findById(seller.getSellerId()).orElseThrow(()-> new SellerException("Seller not found for this Id: "+seller.getSellerId()));
-        Seller existingSeller =
-        Seller newSeller = sellerRepository.save(seller);
-        return newSeller;
+        Optional<Seller> opt = sellerRepository.findByContactNumber(seller.getContactNumber());
+        Optional<Seller> res = sellerRepository.findByEmail(seller.getEmail());
+        if(opt.isEmpty() && res.isEmpty()) {
+            throw new SellerNotFoundException("Seller does not exist with given contact number or email");
+        }
+        Seller existingSeller = null;
+        if(opt.isPresent()) {
+            existingSeller = opt.get();
+        } else {
+            existingSeller = res.get();
+        }
+        UserSession user = sessionRepository.findByToken(token).get();
+        if(existingSeller.getSellerId() == user.getUserId()) {
+            if(seller.getFirstName() != null) {
+                existingSeller.setFirstName(seller.getFirstName());
+            }
+            if(seller.getLastName() != null) {
+                existingSeller.setLastName(seller.getLastName());
+            }
+            if(seller.getEmail() != null) {
+                existingSeller.setEmail(seller.getEmail());
+            }
+            if(seller.getContactNumber() != null) {
+                existingSeller.setContactNumber(seller.getContactNumber());
+            }
+            if(seller.getPassword() != null) {
+                existingSeller.setPassword(seller.getPassword());
+            }
+            sellerRepository.save(existingSeller);
+            return existingSeller;
+        }
+        else {
+            throw new CustomerException("Error in updating Seller data. Verification failed.");
+        }
+    }
+
+    // Delete logged-in seller by contact number
+    public SessionDTO deleteSeller(SellerDTO sellerDTO, String token) throws SellerNotFoundException {
+        if(token.contains("seller") == false) {
+            throw new LoginException("Invalid session token for seller");
+        }
+        loginService.checkTokenStatus(token);
+        UserSession user = sessionRepository.findByToken(token).get();
+        Optional<Seller> opt = sellerRepository.findById(user.getUserId());
+        if(opt.isEmpty()) {
+            throw new SellerNotFoundException("Seller does not exist");
+        }
+        Seller existingSeller = opt.get();
+        SessionDTO session = new SessionDTO();
+        session.setMessage("");
+        session.setToken(token);
+        if (existingSeller.getContactNumber().equals(sellerDTO.getContactNumber())
+                && existingSeller.getPassword().equals(sellerDTO.getPassword())) {
+            sellerRepository.delete(existingSeller);
+            loginService.logoutSeller(session);
+            session.setMessage("Deleted account and logged out successfully");
+            return session;
+        } else {
+            throw new SellerException("Verification error in deleting account. Please, re-check details");
+        }
+    }
+
+    public Seller updateSellerContactNumberOrEmail(SellerUpdateDTO sellerUpdateDTO, String token) throws SellerNotFoundException {
+        if(token.contains("seller") == false) {
+            throw new LoginException("Invalid session token for seller");
+        }
+        loginService.checkTokenStatus(token);
+        UserSession user = sessionRepository.findByToken(token).get();
+        Optional<Seller> opt = sellerRepository.findById(user.getUserId());
+        if(opt.isEmpty()){
+            throw new SellerNotFoundException("Seller doe not exist");
+        }
+        Seller existingSeller = opt.get();
+        if(sellerUpdateDTO.getEmail() != null) {
+            existingSeller.setEmail(sellerUpdateDTO.getEmail());
+        }
+        if(sellerUpdateDTO.getContactNumber() != null) {
+            existingSeller.setContactNumber(sellerUpdateDTO.getContactNumber());
+        }
+        sellerRepository.save(existingSeller);
+        return existingSeller;
+    }
+
+    // Get seller by contact number
+    public Seller getSellerByContactNumber(String contactNumber, String token) throws SellerException {
+        if(token.contains("seller") == false) {
+            throw new LoginException("Invalid session token for seller");
+        }
+        loginService.checkTokenStatus(token);
+        Optional<Seller> opt = sellerRepository.findByContactNumber(contactNumber);
+        if(opt.isEmpty()) {
+            throw new SellerNotFoundException("Seller does not exist");
+        }
+        Seller existingSeller = opt.get();
+        return existingSeller;
+    }
+
+    // Method to update password - based on current token
+    public SessionDTO updateSellerPassword(SellerDTO sellerDTO, String token) {
+        if(token.contains("seller") == false) {
+            throw new LoginException("Invalid session token for seller");
+        }
+        loginService.checkTokenStatus(token);
+        UserSession user = sessionRepository.findByToken(token).get();
+        Optional<Seller> opt = sellerRepository.findById(user.getUserId());
+        if(opt.isEmpty()) {
+            throw new SellerException("Seller does not exist");
+        }
+        Seller existingSeller = opt.get();
+        if(sellerDTO.getContactNumber().equals(existingSeller.getContactNumber()) == false) {
+            throw new SellerException("Verification error. Mobile number does not match");
+        }
+        existingSeller.setPassword(sellerDTO.getPassword());
+        sellerRepository.save(existingSeller);
+        SessionDTO session = new SessionDTO();
+        session.setToken(token);
+        loginService.logoutSeller(session);
+        session.setMessage("Updated password and logged out. Login again with new password");
+        return session;
     }
 
 }

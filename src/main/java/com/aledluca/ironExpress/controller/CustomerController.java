@@ -21,19 +21,19 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
-    // Handler to get a list of all customers
+    // Get a list of all customers
     @GetMapping("/customers")
     public ResponseEntity<List<Customer>> getAllCustomersHandler(@RequestHeader("token") String token){
-        return new ResponseEntity<>(customerService.getAllCustomers(token), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(customerService.getAllCustomers(token), HttpStatus.OK);
     }
 
     // Handler to Get a customer details of currently logged in user - sends data as per token
     @GetMapping("/customer/current")
     public ResponseEntity<Customer> getLoggedInCustomerDetailsHandler(@RequestHeader("token") String token){
-        return new ResponseEntity<>(customerService.getLoggedInCustomerDetails(token), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(customerService.getLoggedInCustomerDetails(token), HttpStatus.OK);
     }
 
-    // Handler to Update a customer
+    // Handler to update a customer
     @PutMapping("/customer")
     public ResponseEntity<Customer> updateCustomerHandler(@Valid @RequestBody CustomerUpdateDTO customerUpdate, @RequestHeader("token") String token){
         return new ResponseEntity<>(customerService.updateCustomer(customerUpdate, token), HttpStatus.ACCEPTED);

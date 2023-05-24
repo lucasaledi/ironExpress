@@ -6,6 +6,7 @@ import com.aledluca.ironExpress.dto.SessionDTO;
 import com.aledluca.ironExpress.exception.CustomerException;
 import com.aledluca.ironExpress.exception.CustomerNotFoundException;
 import com.aledluca.ironExpress.exception.LoginException;
+import com.aledluca.ironExpress.exception.SellerException;
 import com.aledluca.ironExpress.models.*;
 import com.aledluca.ironExpress.repository.CustomerRepository;
 import com.aledluca.ironExpress.repository.SessionRepository;
@@ -44,22 +45,23 @@ public class CustomerService {
         return customer;
     }
 
-    public Customer getLoggedInCustomerDetails(String token){
+    // Get logged-in customer details
+    public Customer getLoggedInCustomerDetails(String token) throws CustomerNotFoundException {
         if(token.contains("customer") == false) {
             throw new LoginException("Invalid session token for customer");
         }
         loginService.checkTokenStatus(token);
         UserSession user = sessionRepository.findByToken(token).get();
         Optional<Customer> opt = customerRepository.findById(user.getUserId());
-        if(opt.isEmpty())
+        if(opt.isEmpty()) {
             throw new CustomerNotFoundException("Customer does not exist");
+        }
         Customer existingCustomer = opt.get();
         return existingCustomer;
     }
 
-    // Method to get all customers - only seller or admin can get all customers - check validity of seller token
+    // Get all customers - only seller or admin can get all customers - check validity of seller token
     public List<Customer> getAllCustomers(String token) throws CustomerNotFoundException {
-        // update to seller
         if(token.contains("seller") == false) {
             throw new LoginException("Invalid session token.");
         }
@@ -72,7 +74,7 @@ public class CustomerService {
         }
     }
 
-    // Method to update entire customer details - either by contact number or email
+    // Update customer data - either by contact number or email
     public Customer updateCustomer(CustomerUpdateDTO customer, String token) throws CustomerNotFoundException {
         if(token.contains("customer") == false) {
             throw new LoginException("Invalid session token for customer");
@@ -86,8 +88,7 @@ public class CustomerService {
         Customer existingCustomer = null;
         if(opt.isPresent()) {
             existingCustomer = opt.get();
-        }
-        else {
+        } else {
             existingCustomer = res.get();
         }
         UserSession user = sessionRepository.findByToken(token).get();
@@ -120,7 +121,7 @@ public class CustomerService {
         }
     }
 
-    // Method to update customer mobile number - details updated for current logged in user
+    // Update customer mobile number - details updated for current logged-in user
     public Customer updateCustomerContactNumberOrEmail(CustomerUpdateDTO customerUpdateDTO, String token) throws CustomerNotFoundException {
         if(token.contains("customer") == false) {
             throw new LoginException("Invalid session token for customer");
@@ -128,16 +129,18 @@ public class CustomerService {
         loginService.checkTokenStatus(token);
         UserSession user = sessionRepository.findByToken(token).get();
         Optional<Customer> opt = customerRepository.findById(user.getUserId());
-        if(opt.isEmpty())
+        if(opt.isEmpty()) {
             throw new CustomerNotFoundException("Customer does not exist");
+        }
         Customer existingCustomer = opt.get();
         if(customerUpdateDTO.getEmail() != null) {
             existingCustomer.setEmail(customerUpdateDTO.getEmail());
         }
-        existingCustomer.setContactNumber(customerUpdateDTO.getContactNumber());
+        if(customerUpdateDTO.getContactNumber() != null) {
+            existingCustomer.setContactNumber(customerUpdateDTO.getContactNumber());
+        }
         customerRepository.save(existingCustomer);
         return existingCustomer;
-
     }
 
     // Method to update password - based on current token
@@ -216,7 +219,7 @@ public class CustomerService {
         return customerRepository.save(existingCustomer);
     }
 
-    // Method to delete a customer by mobile id
+    // Delete logged-in customer by contact number
     public SessionDTO deleteCustomer(CustomerDTO customerDTO, String token) throws CustomerNotFoundException {
         if(token.contains("customer") == false) {
             throw new LoginException("Invalid session token for customer");
@@ -237,9 +240,8 @@ public class CustomerService {
             loginService.logoutCustomer(session);
             session.setMessage("Deleted account and logged out successfully");
             return session;
-        }
-        else {
-            throw new CustomerException("Verification error in deleting account. Please re-check details");
+        } else {
+            throw new CustomerException("Verification error in deleting account. Please, re-check details");
         }
     }
 

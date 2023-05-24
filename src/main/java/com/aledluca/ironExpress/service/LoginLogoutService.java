@@ -90,10 +90,9 @@ public class LoginLogoutService {
             }
             deleteExpiredTokens();
             if(flag) {
-                throw new LoginException("Session expired. Login Again");
+                throw new LoginException("Session expired. Login again");
             }
-        }
-        else {
+        } else {
             throw new LoginException("User not logged in. Invalid session token. Please login first.");
         }
     }
