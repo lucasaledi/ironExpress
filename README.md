@@ -29,3 +29,15 @@ TBD - add screenshot of folder structure
 
 ### Endpoints
 TBD
+
+### Pre-requisites
+Create database
+postgres=#CREATE DATABASE ironexpress;
+Create a schema called test in the default database called postgres
+postgres=# CREATE SCHEMA test;
+Create a role (user) with password
+postgres=# CREATE USER xxx PASSWORD 'yyy';
+Grant privileges (like the ability to create tables) on new schema to new role
+postgres=# GRANT ALL ON SCHEMA test TO xxx;
+Grant privileges (like the ability to insert) to tables in the new schema to the new role
+postgres=# GRANT ALL ON ALL TABLES IN SCHEMA test TO xxx;

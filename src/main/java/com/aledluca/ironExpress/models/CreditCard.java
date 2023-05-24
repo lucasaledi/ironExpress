@@ -3,7 +3,6 @@ package com.aledluca.ironExpress.models;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.*;
 
-@Entity
 public class CreditCard {
     @NotNull(message = "Credit Card number cannot be null")
     @Pattern(regexp = "[0-9]{16,18}", message = "Invalid card number")
