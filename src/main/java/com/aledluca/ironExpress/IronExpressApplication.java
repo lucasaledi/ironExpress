@@ -1,6 +1,12 @@
 package com.aledluca.ironExpress;
 
+import com.aledluca.ironExpress.enums.Category;
+import com.aledluca.ironExpress.enums.ProductStatus;
+import com.aledluca.ironExpress.models.Customer;
+import com.aledluca.ironExpress.models.Product;
 import com.aledluca.ironExpress.models.Seller;
+import com.aledluca.ironExpress.repository.CustomerRepository;
+import com.aledluca.ironExpress.repository.ProductRepository;
 import com.aledluca.ironExpress.repository.SellerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +21,6 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
-import java.time.LocalDateTime;
 
 @SpringBootApplication
 public class IronExpressApplication implements CommandLineRunner {
@@ -36,9 +41,22 @@ public class IronExpressApplication implements CommandLineRunner {
 
 	@Autowired
 	private SellerRepository sellerRepository;
-
+	@Autowired
+	private CustomerRepository customerRepository;
+	@Autowired
+	private ProductRepository productRepository;
 	@Override
 	public void run(String... args) throws Exception {
-		sellerRepository.save(new Seller("Lucas", "Basilio",  "6123456789", "aledluca@gmail.com", "12345678"));
+		// Creating sellers
+		sellerRepository.save(new Seller("Lucas", "Basilio",  "6111111111", "aledluca@gmail.com", "@senhae01"));
+		sellerRepository.save(new Seller("Daniel", "Monteiro",  "6222222222", "montdani@gmail.com", "@senhae02"));
+		// Creating customers
+		customerRepository.save(new Customer("Laura", "Gimenez",  "6333333333", "gimlau@gmail.com", "@senhae03"));
+		customerRepository.save(new Customer("Roberto", "Naval",  "6444444444", "navro@gmail.com", "@senhae04"));
+		// Creating products
+		productRepository.save(new Product("Xanex", 14.99, "Jabon intimo", "Asturias Productos Ltd", 100, Category.GROCERIES, ProductStatus.AVAILABLE));
+		productRepository.save(new Product("Muñeca Turma da Monica", 119.99, "Muñeca para crios", "Laerte Minion Ltd", 0, Category.FASHION, ProductStatus.OUTOFSTOCK));
+		productRepository.save(new Product("70-1 Rules for Life", 49.99, "Self-help book", "Penguin Books", 0, Category.BOOKS, ProductStatus.AVAILABLE));
+
 	}
 }

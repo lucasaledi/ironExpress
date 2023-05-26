@@ -24,7 +24,7 @@ public class SellerController {
     public ResponseEntity<Seller> addSellerHandler(@Valid @RequestBody Seller seller){
         Seller addseller = sellerService.addSeller(seller);
         //System.out.println("Seller"+ seller);
-        return new ResponseEntity<Seller>(addseller, HttpStatus.CREATED);
+        return new ResponseEntity<>(addseller, HttpStatus.CREATED);
     }
 
     // Get the list of all sellers

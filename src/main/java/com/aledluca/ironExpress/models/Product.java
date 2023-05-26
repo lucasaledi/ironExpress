@@ -68,6 +68,16 @@ public class Product {
         this.seller = seller;
     }
 
+    public Product(String productName, Double price, String description, String manufacturer, Integer quantity, Category category, ProductStatus status) {
+        this.productName = productName;
+        this.price = price;
+        this.description = description;
+        this.manufacturer = manufacturer;
+        this.quantity = quantity;
+        this.category = category;
+        this.status = status;
+    }
+
     public Integer getProductId() {
         return productId;
     }
