@@ -28,6 +28,21 @@ TBD
 TBD - add screenshot of folder structure
 
 ### Endpoints
+To have [springdoc-openapi](https://github.com/springdoc/springdoc-openapi) automatically generate the OpenAPI 3 
+specification docs for our API, Then when we run our application, the OpenAPI descriptions will be available at the 
+path `/v3/api-docs` by default:
+> http://localhost:8080/v3/api-docs/
+
+The OpenAPI definitions are in JSON format by default. For yaml format, we can obtain the definitions at:
+> http://localhost:8080/v3/api-docs.yaml
+
+#### Integration with Swagger UI
+Besides generating the OpenAPI 3 specification itself, we can integrate springdoc-openapi with Swagger UI so that we can interact with our API specification and exercise the endpoints.
+The springdoc-openapi dependency already includes Swagger UI, so we're all set here.
+We can simply access the API documentation at:
+> http://localhost:8080/swagger-ui.html
+
+
 TBD
 
 ### Pre-requisites

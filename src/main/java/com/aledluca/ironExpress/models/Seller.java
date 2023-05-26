@@ -62,6 +62,14 @@ public class Seller {
         this.product = product;
     }
 
+    public Seller(String firstName, String lastName, String contactNumber, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.contactNumber = contactNumber;
+        this.email = email;
+        this.password = password;
+    }
+
     public Integer getSellerId() {
         return sellerId;
     }
