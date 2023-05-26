@@ -105,11 +105,11 @@ public class Order {
         this.customer = customer;
     }
 
-    public List<CartItem> getOrdercartItems() {
+    public List<CartItem> getOrderCartItems() {
         return ordercartItems;
     }
 
-    public void setOrdercartItems(List<CartItem> ordercartItems) {
+    public void setOrderCartItems(List<CartItem> ordercartItems) {
         this.ordercartItems = ordercartItems;
     }
 
