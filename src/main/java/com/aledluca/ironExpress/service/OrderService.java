@@ -29,9 +29,64 @@ public class OrderService {
 
 
     // Save order
-    public Order saveOrder(OrderDTO orderDTO, String token) throws LoginException, OrderException {
+//    public Order saveOrder(OrderDTO orderDTO, String token) throws LoginException, OrderException {
+//        Order newOrder= new Order();
+//        Customer loggedInCustomer= customerService.getLoggedInCustomerDetails(token);
+//        if(loggedInCustomer != null) {
+//            //Customer loggedInCustomer= customerService.getLoggedInCustomerDetails(token);
+//            newOrder.setCustomer(loggedInCustomer);
+//            String usersCardNumber= loggedInCustomer.getCreditCard().getCardNumber();
+//            String userGivenCardNumber= orderDTO.getCardNumber().getCardNumber();
+//            List<CartItem> productsInCart= loggedInCustomer.getCustomerCart().getCartItems();
+//            List<CartItem> productsInOrder = new ArrayList<>(productsInCart);
+//            newOrder.setOrderCartItems(productsInOrder);
+//            newOrder.setTotal(loggedInCustomer.getCustomerCart().getCartTotal());
+//            if(productsInCart.size()!=0) {
+//                if((usersCardNumber.equals(userGivenCardNumber))
+//                        && (orderDTO.getCardNumber().getExpireDate().equals(loggedInCustomer.getCreditCard().getExpireDate())
+//                        && (orderDTO.getCardNumber().getCvv().equals(loggedInCustomer.getCreditCard().getCvv())))) {
+//                    //System.out.println(usersCardNumber);
+//                    newOrder.setCardNumber(orderDTO.getCardNumber().getCardNumber());
+//                    newOrder.setAddress(loggedInCustomer.getAddress().get(orderDTO.getAddressType()));
+//                    newOrder.setDate(LocalDate.now());
+//                    newOrder.setOrderStatus(OrderStatusValues.SUCCESS);
+//                    System.out.println(usersCardNumber);
+//                    List<CartItem> cartItemsList= loggedInCustomer.getCustomerCart().getCartItems();
+//                    for(CartItem cartItem : cartItemsList ) {
+//                        Integer remainingQuantity = cartItem.getCartProduct().getQuantity()-cartItem.getCartItemQuantity();
+//                        if(remainingQuantity < 0 || cartItem.getCartProduct().getStatus() == ProductStatus.OUTOFSTOCK) {
+//                            CartDTO cartdto = new CartDTO();
+//                            cartdto.setProductId(cartItem.getCartProduct().getProductId());
+//                            cartService.removeProductFromCart(cartdto, token);
+//                            throw new OrderException("Product "+ cartItem.getCartProduct().getProductName() + " OUT OF STOCK");
+//                        }
+//                        cartItem.getCartProduct().setQuantity(remainingQuantity);
+//                        if(cartItem.getCartProduct().getQuantity()==0) {
+//                            cartItem.getCartProduct().setStatus(ProductStatus.OUTOFSTOCK);
+//                        }
+//                    }
+//                    cartService.clearCart(token);
+//                    //System.out.println(newOrder);
+//                    return orderRepository.save(newOrder);
+//                } else {
+//                    //System.out.println("Not same");
+//                    newOrder.setCardNumber(null);
+//                    newOrder.setAddress(loggedInCustomer.getAddress().get(orderDTO.getAddressType()));
+//                    newOrder.setDate(LocalDate.now());
+//                    newOrder.setOrderStatus(OrderStatusValues.PENDING);
+//                    cartService.clearCart(token);
+//                    return orderRepository.save(newOrder);
+//                }
+//            } else {
+//                throw new OrderException("No products in cart");
+//            }
+//        } else {
+//            throw new LoginException("Invalid session token for customer. Please, make sure to log-in");
+//        }
+//    }
+    public Order saveOrder(OrderDTO orderDTO, Integer userId) throws LoginException, OrderException {
         Order newOrder= new Order();
-        Customer loggedInCustomer= customerService.getLoggedInCustomerDetails(token);
+        Customer loggedInCustomer= customerService.getLoggedInCustomerDetails(userId);
         if(loggedInCustomer != null) {
             //Customer loggedInCustomer= customerService.getLoggedInCustomerDetails(token);
             newOrder.setCustomer(loggedInCustomer);
@@ -50,14 +105,14 @@ public class OrderService {
                     newOrder.setAddress(loggedInCustomer.getAddress().get(orderDTO.getAddressType()));
                     newOrder.setDate(LocalDate.now());
                     newOrder.setOrderStatus(OrderStatusValues.SUCCESS);
-                    System.out.println(usersCardNumber);
+                    //System.out.println(usersCardNumber);
                     List<CartItem> cartItemsList= loggedInCustomer.getCustomerCart().getCartItems();
                     for(CartItem cartItem : cartItemsList ) {
                         Integer remainingQuantity = cartItem.getCartProduct().getQuantity()-cartItem.getCartItemQuantity();
                         if(remainingQuantity < 0 || cartItem.getCartProduct().getStatus() == ProductStatus.OUTOFSTOCK) {
                             CartDTO cartdto = new CartDTO();
                             cartdto.setProductId(cartItem.getCartProduct().getProductId());
-                            cartService.removeProductFromCart(cartdto, token);
+                            cartService.removeProductFromCart(cartdto, userId);
                             throw new OrderException("Product "+ cartItem.getCartProduct().getProductName() + " OUT OF STOCK");
                         }
                         cartItem.getCartProduct().setQuantity(remainingQuantity);
@@ -65,7 +120,7 @@ public class OrderService {
                             cartItem.getCartProduct().setStatus(ProductStatus.OUTOFSTOCK);
                         }
                     }
-                    cartService.clearCart(token);
+                    cartService.clearCart(userId);
                     //System.out.println(newOrder);
                     return orderRepository.save(newOrder);
                 } else {
@@ -74,7 +129,7 @@ public class OrderService {
                     newOrder.setAddress(loggedInCustomer.getAddress().get(orderDTO.getAddressType()));
                     newOrder.setDate(LocalDate.now());
                     newOrder.setOrderStatus(OrderStatusValues.PENDING);
-                    cartService.clearCart(token);
+                    cartService.clearCart(userId);
                     return orderRepository.save(newOrder);
                 }
             } else {
@@ -101,70 +156,116 @@ public class OrderService {
     }
 
     // Cancel order by id
-    public Order cancelOrderByOrderId(Integer OrderId,String token) throws OrderException {
+//    public Order cancelOrderByOrderId(Integer OrderId,String token) throws OrderException {
+//        Order order= orderRepository.findById(OrderId).orElseThrow(()->new OrderException("No order exists with given OrderId "+ OrderId));
+//        if(order.getCustomer().getCustomerId()==customerService.getLoggedInCustomerDetails(token).getCustomerId()) {
+//            if(order.getOrderStatus()==OrderStatusValues.PENDING) {
+//                order.setOrderStatus(OrderStatusValues.CANCELLED);
+//                orderRepository.save(order);
+//                return order;
+//            } else if(order.getOrderStatus()==OrderStatusValues.SUCCESS) {
+//                order.setOrderStatus(OrderStatusValues.CANCELLED);
+//                List<CartItem> cartItemsList= order.getOrderCartItems();
+//                for(CartItem cartItem : cartItemsList ) {
+//                    Integer addedQuantity = cartItem.getCartProduct().getQuantity()+cartItem.getCartItemQuantity();
+//                    cartItem.getCartProduct().setQuantity(addedQuantity);
+//                    if(cartItem.getCartProduct().getStatus() == ProductStatus.OUTOFSTOCK) {
+//                        cartItem.getCartProduct().setStatus(ProductStatus.AVAILABLE);
+//                    }
+//                }
+//                orderRepository.save(order);
+//                return order;
+//            } else {
+//                throw new OrderException("Order was already cancelled");
+//            }
+//        } else {
+//            throw new LoginException("Invalid session token for customer. Please, make sure to log-in");
+//        }
+//    }
+    public Order cancelOrderByOrderId(Integer OrderId) throws OrderException {
         Order order= orderRepository.findById(OrderId).orElseThrow(()->new OrderException("No order exists with given OrderId "+ OrderId));
-        if(order.getCustomer().getCustomerId()==customerService.getLoggedInCustomerDetails(token).getCustomerId()) {
-            if(order.getOrderStatus()==OrderStatusValues.PENDING) {
-                order.setOrderStatus(OrderStatusValues.CANCELLED);
-                orderRepository.save(order);
-                return order;
-            } else if(order.getOrderStatus()==OrderStatusValues.SUCCESS) {
-                order.setOrderStatus(OrderStatusValues.CANCELLED);
-                List<CartItem> cartItemsList= order.getOrderCartItems();
-                for(CartItem cartItem : cartItemsList ) {
-                    Integer addedQuantity = cartItem.getCartProduct().getQuantity()+cartItem.getCartItemQuantity();
-                    cartItem.getCartProduct().setQuantity(addedQuantity);
-                    if(cartItem.getCartProduct().getStatus() == ProductStatus.OUTOFSTOCK) {
-                        cartItem.getCartProduct().setStatus(ProductStatus.AVAILABLE);
-                    }
+        if(order.getOrderStatus()==OrderStatusValues.PENDING) {
+            order.setOrderStatus(OrderStatusValues.CANCELLED);
+            orderRepository.save(order);
+            return order;
+        } else if(order.getOrderStatus()==OrderStatusValues.SUCCESS) {
+            order.setOrderStatus(OrderStatusValues.CANCELLED);
+            List<CartItem> cartItemsList= order.getOrderCartItems();
+            for(CartItem cartItem : cartItemsList ) {
+                Integer addedQuantity = cartItem.getCartProduct().getQuantity()+cartItem.getCartItemQuantity();
+                cartItem.getCartProduct().setQuantity(addedQuantity);
+                if(cartItem.getCartProduct().getStatus() == ProductStatus.OUTOFSTOCK) {
+                    cartItem.getCartProduct().setStatus(ProductStatus.AVAILABLE);
                 }
-                orderRepository.save(order);
-                return order;
-            } else {
-                throw new OrderException("Order was already cancelled");
             }
+            orderRepository.save(order);
+            return order;
         } else {
-            throw new LoginException("Invalid session token for customer. Please, make sure to log-in");
+            throw new OrderException("Order was already cancelled");
         }
     }
 
     // Update order
-    public Order updateOrderByOrder(OrderDTO orderdto, Integer OrderId,String token) throws OrderException,LoginException {
+//    public Order updateOrderByOrder(OrderDTO orderdto, Integer OrderId,String token) throws OrderException,LoginException {
+//        Order existingOrder= orderRepository.findById(OrderId).orElseThrow(()->new OrderException("No order exists with given OrderId "+ OrderId));
+//        if(existingOrder.getCustomer().getCustomerId()==customerService.getLoggedInCustomerDetails(token).getCustomerId()) {
+//            //existingOrder.setCardNumber(orderdto.getCardNumber().getCardNumber());
+//            //existingOrder.setAddress(existingOrder.getCustomer().getAddress().get(orderdto.getAddressType()));
+//            Customer loggedInCustomer = customerService.getLoggedInCustomerDetails(token);
+//            String usersCardNumber= loggedInCustomer.getCreditCard().getCardNumber();
+//            String userGivenCardNumber= orderdto.getCardNumber().getCardNumber();
+//            //System.out.println(loggedInCustomer);
+//            if((usersCardNumber.equals(userGivenCardNumber))
+//                    && (orderdto.getCardNumber().getExpireDate().equals(loggedInCustomer.getCreditCard().getExpireDate())
+//                    && (orderdto.getCardNumber().getCvv().equals(loggedInCustomer.getCreditCard().getCvv())))) {
+//                existingOrder.setCardNumber(orderdto.getCardNumber().getCardNumber());
+//                existingOrder.setAddress(existingOrder.getCustomer().getAddress().get(orderdto.getAddressType()));
+//                existingOrder.setOrderStatus(OrderStatusValues.SUCCESS);
+//                List<CartItem> cartItemsList= existingOrder.getOrderCartItems();
+//                for(CartItem cartItem : cartItemsList ) {
+//                    Integer remainingQuantity = cartItem.getCartProduct().getQuantity()-cartItem.getCartItemQuantity();
+//                    if(remainingQuantity < 0 || cartItem.getCartProduct().getStatus() == ProductStatus.OUTOFSTOCK) {
+//                        CartDTO cartdto = new CartDTO();
+//                        cartdto.setProductId(cartItem.getCartProduct().getProductId());
+//                        cartService.removeProductFromCart(cartdto, token);
+//                        throw new OrderException("Product "+ cartItem.getCartProduct().getProductName() + " OUT OF STOCK");
+//                    }
+//                    cartItem.getCartProduct().setQuantity(remainingQuantity);
+//                    if(cartItem.getCartProduct().getQuantity()==0) {
+//                        cartItem.getCartProduct().setStatus(ProductStatus.OUTOFSTOCK);
+//                    }
+//                }
+//                return orderRepository.save(existingOrder);
+//            } else {
+//                throw new OrderException("Incorrect Card Number Again" + usersCardNumber + userGivenCardNumber);
+//            }
+//        } else {
+//            throw new LoginException("Invalid session token for customer. Please, make sure to log-in");
+//        }
+//    }
+    public Order updateOrderByOrderId(OrderDTO orderdto, Integer OrderId, Integer userId) throws OrderException,LoginException {
         Order existingOrder= orderRepository.findById(OrderId).orElseThrow(()->new OrderException("No order exists with given OrderId "+ OrderId));
-        if(existingOrder.getCustomer().getCustomerId()==customerService.getLoggedInCustomerDetails(token).getCustomerId()) {
-            //existingOrder.setCardNumber(orderdto.getCardNumber().getCardNumber());
-            //existingOrder.setAddress(existingOrder.getCustomer().getAddress().get(orderdto.getAddressType()));
-            Customer loggedInCustomer = customerService.getLoggedInCustomerDetails(token);
-            String usersCardNumber= loggedInCustomer.getCreditCard().getCardNumber();
-            String userGivenCardNumber= orderdto.getCardNumber().getCardNumber();
-            //System.out.println(loggedInCustomer);
-            if((usersCardNumber.equals(userGivenCardNumber))
-                    && (orderdto.getCardNumber().getExpireDate().equals(loggedInCustomer.getCreditCard().getExpireDate())
-                    && (orderdto.getCardNumber().getCvv().equals(loggedInCustomer.getCreditCard().getCvv())))) {
-                existingOrder.setCardNumber(orderdto.getCardNumber().getCardNumber());
-                existingOrder.setAddress(existingOrder.getCustomer().getAddress().get(orderdto.getAddressType()));
-                existingOrder.setOrderStatus(OrderStatusValues.SUCCESS);
-                List<CartItem> cartItemsList= existingOrder.getOrderCartItems();
-                for(CartItem cartItem : cartItemsList ) {
-                    Integer remainingQuantity = cartItem.getCartProduct().getQuantity()-cartItem.getCartItemQuantity();
-                    if(remainingQuantity < 0 || cartItem.getCartProduct().getStatus() == ProductStatus.OUTOFSTOCK) {
-                        CartDTO cartdto = new CartDTO();
-                        cartdto.setProductId(cartItem.getCartProduct().getProductId());
-                        cartService.removeProductFromCart(cartdto, token);
-                        throw new OrderException("Product "+ cartItem.getCartProduct().getProductName() + " OUT OF STOCK");
-                    }
-                    cartItem.getCartProduct().setQuantity(remainingQuantity);
-                    if(cartItem.getCartProduct().getQuantity()==0) {
-                        cartItem.getCartProduct().setStatus(ProductStatus.OUTOFSTOCK);
-                    }
-                }
-                return orderRepository.save(existingOrder);
-            } else {
-                throw new OrderException("Incorrect Card Number Again" + usersCardNumber + userGivenCardNumber);
+        //existingOrder.setCardNumber(orderdto.getCardNumber().getCardNumber());
+        //existingOrder.setAddress(existingOrder.getCustomer().getAddress().get(orderdto.getAddressType()));
+        //System.out.println(loggedInCustomer);
+        existingOrder.setCardNumber(orderdto.getCardNumber().getCardNumber());
+        existingOrder.setAddress(existingOrder.getCustomer().getAddress().get(orderdto.getAddressType()));
+        existingOrder.setOrderStatus(OrderStatusValues.SUCCESS);
+        List<CartItem> cartItemsList= existingOrder.getOrderCartItems();
+        for(CartItem cartItem : cartItemsList ) {
+            Integer remainingQuantity = cartItem.getCartProduct().getQuantity()-cartItem.getCartItemQuantity();
+            if(remainingQuantity < 0 || cartItem.getCartProduct().getStatus() == ProductStatus.OUTOFSTOCK) {
+                CartDTO cartdto = new CartDTO();
+                cartdto.setProductId(cartItem.getCartProduct().getProductId());
+                cartService.removeProductFromCart(cartdto, userId);
+                throw new OrderException("Product "+ cartItem.getCartProduct().getProductName() + " OUT OF STOCK");
             }
-        } else {
-            throw new LoginException("Invalid session token for customer. Please, make sure to log-in");
+            cartItem.getCartProduct().setQuantity(remainingQuantity);
+            if(cartItem.getCartProduct().getQuantity()==0) {
+                cartItem.getCartProduct().setStatus(ProductStatus.OUTOFSTOCK);
+            }
         }
+        return orderRepository.save(existingOrder);
     }
 
     // Get all orders by date

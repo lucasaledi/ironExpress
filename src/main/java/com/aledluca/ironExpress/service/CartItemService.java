@@ -14,8 +14,8 @@ public class CartItemService {
     @Autowired
     private ProductRepository productRepository;
 
-    public CartItem addItemToCart(CartDTO cartdto) {
-        Product existingProduct = productRepository.findById(cartdto.getProductId()).orElseThrow( () -> new ProductNotFoundException("Product Not found"));
+    public CartItem addItemToCart(CartDTO cartDTO) {
+        Product existingProduct = productRepository.findById(cartDTO.getProductId()).orElseThrow( () -> new ProductNotFoundException("Product Not found"));
         if(existingProduct.getStatus().equals(ProductStatus.OUTOFSTOCK) || existingProduct.getQuantity() == 0) {
             throw new ProductNotFoundException("Product OUT OF STOCK");
         }

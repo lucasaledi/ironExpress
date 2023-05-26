@@ -23,9 +23,13 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping("/order/place")
-    public ResponseEntity<Order> addOrder(@Valid @RequestBody OrderDTO orderDTO, @RequestHeader("token") String token){
-        return new ResponseEntity<>(orderService.saveOrder(orderDTO,token), HttpStatus.CREATED);
+//    @PostMapping("/order/place")
+//    public ResponseEntity<Order> addOrder(@Valid @RequestBody OrderDTO orderDTO, @RequestHeader("token") String token){
+//        return new ResponseEntity<>(orderService.saveOrder(orderDTO,token), HttpStatus.CREATED);
+//    }
+    @PostMapping("/order/place({userId}")
+    public ResponseEntity<Order> addOrder(@Valid @RequestBody OrderDTO orderDTO, @PathVariable Integer userId){
+        return new ResponseEntity<>(orderService.saveOrder(orderDTO,userId), HttpStatus.CREATED);
     }
 
     @GetMapping("/orders")
@@ -38,18 +42,27 @@ public class OrderController {
         return orderService.getOrderByOrderId(orderId);
     }
 
+//    @DeleteMapping("/orders/{orderId}")
+//    public Order cancelOrderByOrderId(@PathVariable("orderId") Integer orderId,@RequestHeader("token") String token){
+//        return orderService.cancelOrderByOrderId(orderId,token);
+//    }
     @DeleteMapping("/orders/{orderId}")
-    public Order cancelOrderByOrderId(@PathVariable("orderId") Integer orderId,@RequestHeader("token") String token){
-        return orderService.cancelOrderByOrderId(orderId,token);
+    public Order cancelOrderByOrderId(@PathVariable("orderId") Integer orderId){
+        return orderService.cancelOrderByOrderId(orderId);
     }
 
-    @PutMapping("/orders/{orderId}")
-    public ResponseEntity<Order> updateOrderByOrder(@Valid @RequestBody OrderDTO orderdto, @PathVariable("orderId") Integer orderId,@RequestHeader("token") String token){
-        Order updatedOrder= orderService.updateOrderByOrder(orderdto,orderId,token);
-        return new ResponseEntity<Order>(updatedOrder,HttpStatus.ACCEPTED);
+//    @PutMapping("/orders/{orderId}")
+//    public ResponseEntity<Order> updateOrderByOrderId(@Valid @RequestBody OrderDTO orderdto, @PathVariable("orderId") Integer orderId,@RequestHeader("token") String token){
+//        Order updatedOrder= orderService.updateOrderByOrder(orderdto,orderId,token);
+//        return new ResponseEntity<Order>(updatedOrder,HttpStatus.ACCEPTED);
+//    }
+    @PutMapping("/orders/{orderId}/{userId}")
+    public ResponseEntity<Order> updateOrderByOrderId(@Valid @RequestBody OrderDTO orderdto, @PathVariable("orderId") Integer orderId, @PathVariable("userId") Integer userId){
+        Order updatedOrder= orderService.updateOrderByOrderId(orderdto,orderId,userId);
+        return new ResponseEntity<>(updatedOrder,HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("/orders/by/date")
+    @GetMapping("/orders/by/{date}")
     public List<Order> getOrdersByDate(@RequestParam("date") String date){
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate ld = LocalDate.parse(date,dtf);

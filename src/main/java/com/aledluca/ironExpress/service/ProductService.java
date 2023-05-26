@@ -26,11 +26,28 @@ public class ProductService {
     private SellerRepository sellerRepository;
 
     // Add product to catalog
-    public Product addProductToCatalog(String token, Product product) {
+//    public Product addProductToCatalog(String token, Product product) {
+//        Product prod = null;
+//        Seller seller1 = sellerService.getCurrentlyLoggedInSeller(token);
+//        product.setSeller(seller1);
+//        Seller Existingseller = sellerService.getSellerByContactNumber(product.getSeller().getContactNumber(), token);
+//        Optional<Seller> opt = sellerRepository.findById(Existingseller.getSellerId());
+//        if (opt.isPresent()) {
+//            Seller seller = opt.get();
+//            product.setSeller(seller);
+//            prod = productRepository.save(product);
+//            seller.getProduct().add(product);
+//            sellerRepository.save(seller);
+//        } else {
+//            prod = productRepository.save(product);
+//        }
+//        return prod;
+//    }
+    public Product addProductToCatalog(Product product, Integer userId) {
         Product prod = null;
-        Seller seller1 = sellerService.getCurrentlyLoggedInSeller(token);
+        Seller seller1 = sellerService.getCurrentlyLoggedInSeller(userId);
         product.setSeller(seller1);
-        Seller Existingseller = sellerService.getSellerByContactNumber(product.getSeller().getContactNumber(), token);
+        Seller Existingseller = sellerService.getSellerByContactNumber(product.getSeller().getContactNumber());
         Optional<Seller> opt = sellerRepository.findById(Existingseller.getSellerId());
         if (opt.isPresent()) {
             Seller seller = opt.get();
