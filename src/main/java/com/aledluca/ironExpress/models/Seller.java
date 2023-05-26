@@ -1,5 +1,6 @@
 package com.aledluca.ironExpress.models;
 
+import com.aledluca.ironExpress.security.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;

@@ -29,8 +29,11 @@ public class SellerController {
 
     // Get the list of all sellers
     @GetMapping("/sellers")
-    public ResponseEntity<List<Seller>> getAllSellerHandler(@RequestHeader("token") String token){
-        return new ResponseEntity<>(sellerService.getAllSellers(token), HttpStatus.OK);
+//    public ResponseEntity<List<Seller>> getAllSellerHandler(@RequestHeader("token") String token){
+//        return new ResponseEntity<>(sellerService.getAllSellers(token), HttpStatus.OK);
+//    }
+    public ResponseEntity<List<Seller>> getAllSellerHandler(){
+        return new ResponseEntity<>(sellerService.getAllSellers(), HttpStatus.OK);
     }
 
     // Get seller by id

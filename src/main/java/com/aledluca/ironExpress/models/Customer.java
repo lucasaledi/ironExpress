@@ -1,5 +1,6 @@
 package com.aledluca.ironExpress.models;
 
+import com.aledluca.ironExpress.security.models.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 

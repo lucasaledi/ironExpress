@@ -53,11 +53,19 @@ public class SellerService {
     }
 
     // Get all sellers in repo - only seller or admin can get all customers - check validity of seller token
-    public List<Seller> getAllSellers(String token) throws SellerNotFoundException {
-        if(token.contains("seller") == false) {
-            throw new LoginException("Invalid session token.");
-        }
-        loginService.checkTokenStatus(token);
+//    public List<Seller> getAllSellers(String token) throws SellerNotFoundException {
+//        if(token.contains("seller") == false) {
+//            throw new LoginException("Invalid session token.");
+//        }
+//        loginService.checkTokenStatus(token);
+//        List<Seller> sellers = sellerRepository.findAll();
+//        if(sellers.size() == 0) {
+//            throw new SellerNotFoundException("No record exists");
+//        } else {
+//            return sellers;
+//        }
+//    }
+    public List<Seller> getAllSellers() throws SellerNotFoundException {
         List<Seller> sellers = sellerRepository.findAll();
         if(sellers.size() == 0) {
             throw new SellerNotFoundException("No record exists");
