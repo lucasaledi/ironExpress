@@ -25,8 +25,8 @@ public class CartController {
 //    public ResponseEntity<Cart> addProductToCartHandler(@RequestBody CartDTO cartdto , @RequestHeader("token")String token){
 //        return new ResponseEntity<>(cartService.addProductToCart(cartdto, token), HttpStatus.CREATED);
 //    }
-    @PostMapping(value = "/cart/add")
-    public ResponseEntity<Cart> addProductToCartHandler(@RequestBody CartDTO cartDTO, Integer userId) {
+    @PostMapping(value = "/cart/{userId}/add")
+    public ResponseEntity<Cart> addProductToCartHandler(@RequestBody CartDTO cartDTO, @PathVariable Integer userId) {
         return new ResponseEntity<>(cartService.addProductToCart(cartDTO, userId), HttpStatus.CREATED);
     }
 

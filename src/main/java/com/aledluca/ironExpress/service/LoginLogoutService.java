@@ -146,13 +146,9 @@ public class LoginLogoutService {
 
     // Method to delete expired tokens
     public void deleteExpiredTokens() {
-
         //System.out.println("Inside delete tokens");
-
         List<UserSession> users = sessionRepository.findAll();
-
         //System.out.println(users);
-
         if(users.size() > 0) {
             for(UserSession user:users) {
                 //System.out.println(user.getUserId());

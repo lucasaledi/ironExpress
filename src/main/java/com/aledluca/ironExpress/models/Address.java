@@ -1,6 +1,7 @@
 package com.aledluca.ironExpress.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.persistence.GenerationType;
@@ -15,6 +16,7 @@ public class Address {
     private Integer addressId;
     @NotNull(message = "Street name cannot be null")
     @Pattern(regexp = "[A-Za-z0-9\\s-]{3,}", message = "Not a valid street name")
+    @JsonProperty("streetName")
     private String streetName;
     @NotNull(message = "Build number name cannot be null")
     @Pattern(regexp = "[A-Za-z0-9\\s-]{3,}", message = "Not a valid street number")
@@ -61,6 +63,16 @@ public class Address {
         this.country = country;
         this.zipCode = zipCode;
         this.customer = customer;
+    }
+
+    public Address(String streetName, String buildNumber, String addressComplement, String neighborhood, String city, String country, String zipCode) {
+        this.streetName = streetName;
+        this.buildNumber = buildNumber;
+        this.addressComplement = addressComplement;
+        this.neighborhood = neighborhood;
+        this.city = city;
+        this.country = country;
+        this.zipCode = zipCode;
     }
 
     public Integer getAddressId() {

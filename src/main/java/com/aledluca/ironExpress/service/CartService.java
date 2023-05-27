@@ -71,8 +71,7 @@ public class CartService {
 //        return cartRepository.save(existingCustomer.getCustomerCart());
 //    }
     public Cart addProductToCart(CartDTO cartDto, Integer userId) {
-        UserSession user = sessionRepository.findByUserId(userId).get();
-        Optional<Customer> opt = customerRepository.findById(user.getUserId());
+        Optional<Customer> opt = customerRepository.findById(userId);
         if(opt.isEmpty())
             throw new CustomerNotFoundException("Customer does not exist");
         Customer existingCustomer = opt.get();

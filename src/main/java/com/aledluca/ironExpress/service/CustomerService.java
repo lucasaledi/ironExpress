@@ -10,6 +10,7 @@ import com.aledluca.ironExpress.exception.SellerException;
 import com.aledluca.ironExpress.models.*;
 import com.aledluca.ironExpress.repository.CustomerRepository;
 import com.aledluca.ironExpress.repository.SessionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,16 @@ public class CustomerService {
             customerRepository.save(customer);
         }
         return customer;
+    }
+
+    // Get customer by id
+    public Customer getCustomerById(Integer userId) {
+        Optional<Customer> customer = customerRepository.findById(userId);
+        if(customer.isPresent()) {
+            return customer.get();
+        } else {
+            throw new CustomerException("Customer not found for id: " + userId);
+        }
     }
 
     // Get logged-in customer details
@@ -137,11 +148,13 @@ public class CustomerService {
 //            throw new CustomerException("Error in updating Customer data. Verification failed.");
 //        }
 //    }
-    public Customer updateCustomer(CustomerUpdateDTO customer, Integer userId) throws CustomerNotFoundException {
+    public Customer updateCustomer(CustomerUpdateDTO customer) throws CustomerNotFoundException {
         Optional<Customer> opt = customerRepository.findByContactNumber(customer.getContactNumber());
+        System.out.println(opt);
         Optional<Customer> res = customerRepository.findByEmail(customer.getEmail());
+        System.out.println(res);
         if(opt.isEmpty() && res.isEmpty()) {
-            throw new CustomerNotFoundException("Customer does not exist with given mobile no or email-id");
+            throw new CustomerNotFoundException("Customer does not exist with given contact number or email");
         }
         Customer existingCustomer = null;
         if(opt.isPresent()) {
@@ -149,34 +162,29 @@ public class CustomerService {
         } else {
             existingCustomer = res.get();
         }
-        UserSession user = sessionRepository.findByUserId(userId).get();
-        if(existingCustomer.getCustomerId() == user.getUserId()) {
-            if(customer.getFirstName() != null) {
-                existingCustomer.setFirstName(customer.getFirstName());
-            }
-            if(customer.getLastName() != null) {
-                existingCustomer.setLastName(customer.getLastName());
-            }
-            if(customer.getEmail() != null) {
-                existingCustomer.setEmail(customer.getEmail());
-            }
-            if(customer.getContactNumber() != null) {
-                existingCustomer.setContactNumber(customer.getContactNumber());
-            }
-            if(customer.getPassword() != null) {
-                existingCustomer.setPassword(customer.getPassword());
-            }
-            if(customer.getAddress() != null) {
-                for(Map.Entry<String, Address> values : customer.getAddress().entrySet()) {
-                    existingCustomer.getAddress().put(values.getKey(), values.getValue());
-                }
-            }
-            customerRepository.save(existingCustomer);
-            return existingCustomer;
+
+        if(customer.getFirstName() != null) {
+            existingCustomer.setFirstName(customer.getFirstName());
         }
-        else {
-            throw new CustomerException("Error in updating Customer data. Verification failed.");
+        if(customer.getLastName() != null) {
+            existingCustomer.setLastName(customer.getLastName());
         }
+        if(customer.getEmail() != null) {
+            existingCustomer.setEmail(customer.getEmail());
+        }
+        if(customer.getContactNumber() != null) {
+            existingCustomer.setContactNumber(customer.getContactNumber());
+        }
+        if(customer.getPassword() != null) {
+            existingCustomer.setPassword(customer.getPassword());
+        }
+        if(customer.getAddress() != null) {
+            for(Map.Entry<String, Address> values : customer.getAddress().entrySet()) {
+                existingCustomer.getAddress().put(values.getKey(), values.getValue());
+            }
+        }
+        customerRepository.save(existingCustomer);
+        return existingCustomer;
     }
 
     // Update customer mobile number - details updated for current logged-in user
@@ -201,8 +209,7 @@ public class CustomerService {
 //        return existingCustomer;
 //    }
     public Customer updateCustomerContactNumberOrEmail(CustomerUpdateDTO customerUpdateDTO, Integer userId) throws CustomerNotFoundException {
-        UserSession user = sessionRepository.findByUserId(userId).get();
-        Optional<Customer> opt = customerRepository.findById(user.getUserId());
+        Optional<Customer> opt = customerRepository.findById(userId);
         if(opt.isEmpty()) {
             throw new CustomerNotFoundException("Customer does not exist");
         }
@@ -241,13 +248,12 @@ public class CustomerService {
 //        return session;
 //    }
     public SessionDTO updateCustomerPassword(CustomerDTO customerDTO, Integer userId) {
-        UserSession user = sessionRepository.findByUserId(userId).get();
-        Optional<Customer> opt = customerRepository.findById(user.getUserId());
+        Optional<Customer> opt = customerRepository.findById(userId);
         if(opt.isEmpty()) {
             throw new CustomerNotFoundException("Customer does not exist");
         }
         Customer existingCustomer = opt.get();
-        if(customerDTO.getContactNumber().equals(existingCustomer.getContactNumber()) == false) {
+        if(!customerDTO.getContactNumber().equals(existingCustomer.getContactNumber())) {
             throw new CustomerException("Verification error. Contact number does not match");
         }
         existingCustomer.setPassword(customerDTO.getPassword());
@@ -255,7 +261,7 @@ public class CustomerService {
         SessionDTO session = new SessionDTO();
         // Likely to throw an error
         session.setToken(session.getToken());
-        loginService.logoutCustomer(session);
+        //loginService.logoutCustomer(session);
         session.setMessage("Updated password and logged out. Login again with new password");
         return session;
     }
@@ -303,8 +309,7 @@ public class CustomerService {
 //        return customerRepository.save(existingCustomer);
 //    }
     public Customer updateCreditCardDetails(CreditCard card, Integer userId) throws CustomerException{
-        UserSession user = sessionRepository.findByUserId(userId).get();
-        Optional<Customer> opt = customerRepository.findById(user.getUserId());
+        Optional<Customer> opt = customerRepository.findById(userId);
         if(opt.isEmpty()) {
             throw new CustomerNotFoundException("Customer does not exist");
         }
@@ -332,8 +337,7 @@ public class CustomerService {
 //        return customerRepository.save(existingCustomer);
 //    }
     public Customer deleteAddress(String type, Integer userId) throws CustomerException, CustomerNotFoundException {
-        UserSession user = sessionRepository.findByUserId(userId).get();
-        Optional<Customer> opt = customerRepository.findById(user.getUserId());
+        Optional<Customer> opt = customerRepository.findById(userId);
         if(opt.isEmpty()) {
             throw new CustomerNotFoundException("Customer does not exist");
         }
@@ -371,20 +375,19 @@ public class CustomerService {
 //        }
 //    }
     public SessionDTO deleteCustomer(CustomerDTO customerDTO, Integer userId) throws CustomerNotFoundException {
-        UserSession user = sessionRepository.findByUserId(userId).get();
-        Optional<Customer> opt = customerRepository.findById(user.getUserId());
+        Optional<Customer> opt = customerRepository.findById(userId);
         if(opt.isEmpty()) {
             throw new CustomerNotFoundException("Customer does not exist");
         }
         Customer existingCustomer = opt.get();
         SessionDTO session = new SessionDTO();
         session.setMessage("");
-        //Likely to throw an error
-        session.setToken(session.getToken());
+        // Likely to throw an error
+        //session.setToken(session.getToken());
         if(existingCustomer.getContactNumber().equals(customerDTO.getContactNumber())
                 && existingCustomer.getPassword().equals(customerDTO.getPassword())) {
             customerRepository.delete(existingCustomer);
-            loginService.logoutCustomer(session);
+            //loginService.logoutCustomer(session);
             session.setMessage("Deleted account and logged out successfully");
             return session;
         } else {

@@ -1,6 +1,9 @@
 package com.aledluca.ironExpress.dto;
 
 import com.aledluca.ironExpress.models.Address;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.*;
 
 import java.util.HashMap;
@@ -11,7 +14,6 @@ public class CustomerUpdateDTO {
     private String firstName;
     @Pattern(regexp = "[A-Za-z.\\s]+", message = "Enter valid characters in last name")
     private String lastName;
-    @NotNull(message = "Contact number cannot be null")
     @Pattern(regexp = "[6789]{1}[0-9]{9}", message = "Enter valid 10 digit contact number")
     private String contactNumber;
     @Email
@@ -31,6 +33,7 @@ public class CustomerUpdateDTO {
         this.password = password;
         this.address = address;
     }
+
 
     public String getFirstName() {
         return firstName;
@@ -78,5 +81,17 @@ public class CustomerUpdateDTO {
 
     public void setAddress(Map<String, Address> address) {
         this.address = address;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomerUpdateDTO{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", contactNumber='" + contactNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", address=" + address +
+                '}';
     }
 }

@@ -21,14 +21,25 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
+    // Add new customer
+    @PostMapping("/customers/add")
+    public ResponseEntity<Customer> addCustomer(@RequestBody Customer customer){
+        return new ResponseEntity<>(customerService.addCustomer(customer), HttpStatus.CREATED);
+    }
+
     // Get a list of all customers
 //    @GetMapping("/customers")
 //    public ResponseEntity<List<Customer>> getAllCustomersHandler(@RequestHeader("token") String token){
 //        return new ResponseEntity<>(customerService.getAllCustomers(token), HttpStatus.OK);
 //    }
-    @GetMapping("/customers")
+    @GetMapping("/customers/get/all")
     public ResponseEntity<List<Customer>> getAllCustomersHandler(){
         return new ResponseEntity<>(customerService.getAllCustomers(), HttpStatus.OK);
+    }
+
+    @GetMapping("/customers/get/by/{userId}")
+    public ResponseEntity<Customer> getCustomerByIdHandler(@PathVariable Integer userId){
+        return new ResponseEntity<>(customerService.getCustomerById(userId), HttpStatus.OK);
     }
 
     // Handler to Get a customer details of currently logged in user - sends data as per token
@@ -36,7 +47,7 @@ public class CustomerController {
 //    public ResponseEntity<Customer> getLoggedInCustomerDetailsHandler(@RequestHeader("token") String token){
 //        return new ResponseEntity<>(customerService.getLoggedInCustomerDetails(token), HttpStatus.OK);
 //    }
-    @GetMapping("/customer/current/{userId}")
+    @GetMapping("/customer/get/current/{userId}")
     public ResponseEntity<Customer> getLoggedInCustomerDetailsHandler(@PathVariable Integer userId){
         return new ResponseEntity<>(customerService.getLoggedInCustomerDetails(userId), HttpStatus.OK);
     }
@@ -46,9 +57,9 @@ public class CustomerController {
 //    public ResponseEntity<Customer> updateCustomerHandler(@Valid @RequestBody CustomerUpdateDTO customerUpdate, @RequestHeader("token") String token){
 //        return new ResponseEntity<>(customerService.updateCustomer(customerUpdate, token), HttpStatus.ACCEPTED);
 //    }
-    @PutMapping("/customer/{userId}")
-    public ResponseEntity<Customer> updateCustomerHandler(@Valid @RequestBody CustomerUpdateDTO customerUpdate, @PathVariable Integer userId){
-        return new ResponseEntity<>(customerService.updateCustomer(customerUpdate, userId), HttpStatus.ACCEPTED);
+    @PutMapping("/customers/update")
+    public ResponseEntity<Customer> updateCustomerHandler(@Valid @RequestBody CustomerUpdateDTO customerUpdate){
+        return new ResponseEntity<>(customerService.updateCustomer(customerUpdate), HttpStatus.ACCEPTED);
     }
 
     // Handler to update a customer email or contact number
@@ -56,7 +67,11 @@ public class CustomerController {
 //    public ResponseEntity<Customer> updateCustomerMobileEmailHandler(@Valid @RequestBody CustomerUpdateDTO customerUpdate, @RequestHeader("token") String token){
 //        return new ResponseEntity<>(customerService.updateCustomerContactNumberOrEmail(customerUpdate, token), HttpStatus.ACCEPTED);
 //    }
-    @PutMapping("/customer/update/credentials/{userId}")
+    /* Issue while using endpoint
+    ExceptionHandlerExceptionResolver : org.springframework.transaction.TransactionSystemException:
+    Could not commit JPA transaction
+    */
+    @PutMapping("/customers/update/credentials/{userId}")
     public ResponseEntity<Customer> updateCustomerMobileEmailHandler(@Valid @RequestBody CustomerUpdateDTO customerUpdate, @PathVariable Integer userId){
         return new ResponseEntity<>(customerService.updateCustomerContactNumberOrEmail(customerUpdate, userId), HttpStatus.ACCEPTED);
     }
@@ -66,7 +81,7 @@ public class CustomerController {
 //    public ResponseEntity<SessionDTO> updateCustomerPasswordHandler(@Valid @RequestBody CustomerDTO customerDto, @RequestHeader("token") String token){
 //        return new ResponseEntity<>(customerService.updateCustomerPassword(customerDto, token), HttpStatus.ACCEPTED);
 //    }
-    @PutMapping("/customer/update/password/{userId}")
+    @PutMapping("/customers/update/password/{userId}")
     public ResponseEntity<SessionDTO> updateCustomerPasswordHandler(@Valid @RequestBody CustomerDTO customerDto, @PathVariable Integer userId){
         return new ResponseEntity<>(customerService.updateCustomerPassword(customerDto, userId), HttpStatus.ACCEPTED);
     }
@@ -77,7 +92,7 @@ public class CustomerController {
 //        return new ResponseEntity<>(customerService.updateAddress(address, type, token), HttpStatus.ACCEPTED);
 //    }
 
-    @PutMapping("/customer/update/address/{userId}")
+    @PutMapping("/customers/update/address/{userId}")
     public ResponseEntity<Customer> updateAddressHandler(@Valid @RequestBody Address address, @RequestParam("type") String type, @PathVariable Integer userId){
         return new ResponseEntity<>(customerService.updateAddress(address, type, userId), HttpStatus.ACCEPTED);
     }
@@ -87,7 +102,7 @@ public class CustomerController {
 //    public ResponseEntity<Customer> updateCreditCardHandler(@RequestHeader("token") String token, @Valid @RequestBody CreditCard newCard){
 //        return new ResponseEntity<>(customerService.updateCreditCardDetails(token, newCard), HttpStatus.ACCEPTED);
 //    }
-    @PutMapping("/customer/update/card/{userId}")
+    @PutMapping("/customers/update/card/{userId}")
     public ResponseEntity<Customer> updateCreditCardHandler(@Valid @RequestBody CreditCard newCard, @PathVariable Integer userId){
         return new ResponseEntity<>(customerService.updateCreditCardDetails(newCard, userId), HttpStatus.ACCEPTED);
     }
@@ -97,7 +112,7 @@ public class CustomerController {
 //    public ResponseEntity<Customer> deleteAddressHandler(@RequestParam("type") String type, @RequestHeader("token") String token){
 //        return new ResponseEntity<>(customerService.deleteAddress(type, token), HttpStatus.ACCEPTED);
 //    }
-    @DeleteMapping("/customer/delete/address/{userId}")
+    @DeleteMapping("/customers/delete/address/{userId}")
     public ResponseEntity<Customer> deleteAddressHandler(@RequestParam("type") String type, @PathVariable Integer userId){
         return new ResponseEntity<>(customerService.deleteAddress(type, userId), HttpStatus.ACCEPTED);
     }
@@ -107,7 +122,7 @@ public class CustomerController {
 //    public ResponseEntity<SessionDTO> deleteCustomerHandler(@Valid @RequestBody CustomerDTO customerDto, @RequestHeader("token") String token){
 //        return new ResponseEntity<>(customerService.deleteCustomer(customerDto, token), HttpStatus.ACCEPTED);
 //    }
-    @DeleteMapping("/customer/{userId}")
+    @DeleteMapping("/customers/{userId}")
     public ResponseEntity<SessionDTO> deleteCustomerHandler(@Valid @RequestBody CustomerDTO customerDto, @PathVariable Integer userId){
         return new ResponseEntity<>(customerService.deleteCustomer(customerDto, userId), HttpStatus.ACCEPTED);
     }
@@ -117,7 +132,7 @@ public class CustomerController {
 //    public ResponseEntity<List<Order>> getCustomerOrdersHandler(@RequestHeader("token") String token){
 //        return new ResponseEntity<>(customerService.getCustomerOrders(token), HttpStatus.ACCEPTED);
 //    }
-    @GetMapping("/customer/orders/{userId}")
+    @GetMapping("/customers/orders/{userId}")
     public ResponseEntity<List<Order>> getCustomerOrdersHandler(@PathVariable Integer userId){
         return new ResponseEntity<>(customerService.getCustomerOrders(userId), HttpStatus.ACCEPTED);
     }
